@@ -3,22 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Himnario Pro V3</title>
+    <title>Himnario Web</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Estilos personalizados */
         body { background-color: #f3f4f6; }
         .fade-in { animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Scrollbar elegante */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
-
-        /* Rango de input personalizado */
         input[type=range] { -webkit-appearance: none; background: transparent; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #4f46e5; margin-top: -6px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #e2e8f0; border-radius: 2px; }
@@ -29,17 +24,14 @@
     <nav class="bg-gradient-to-r from-indigo-900 to-purple-800 text-white sticky top-0 z-50 shadow-lg px-4 py-3">
         <div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-3">
             <div class="flex items-center gap-3">
-                <div class="bg-white/10 p-2 rounded-lg">
-                    <i class="fa-solid fa-music text-yellow-400 text-2xl"></i>
-                </div>
+                <div class="bg-white/10 p-2 rounded-lg"><i class="fa-solid fa-music text-yellow-400 text-2xl"></i></div>
                 <div>
                     <h1 class="font-bold text-xl tracking-wide">HIMNARIO<span class="text-indigo-300">WEB</span></h1>
                     <p class="text-[10px] text-indigo-200 uppercase tracking-widest" id="total-songs">Cargando...</p>
                 </div>
             </div>
-            
             <div class="relative w-full md:w-96 group">
-                <input type="text" id="search" onkeyup="filterSongs()" placeholder="Buscar número o nombre..." 
+                <input type="text" id="search" onkeyup="filterSongs()" placeholder="Buscar himno..." 
                     class="w-full bg-white/10 border border-white/20 rounded-full py-2 pl-10 pr-4 text-sm text-white placeholder-indigo-200 focus:outline-none focus:bg-white/20 focus:ring-2 focus:ring-yellow-400 transition">
                 <i class="fa-solid fa-search absolute left-3.5 top-2.5 text-indigo-300 group-focus-within:text-yellow-400"></i>
             </div>
@@ -47,35 +39,22 @@
     </nav>
 
     <main class="container mx-auto px-4 py-8 fade-in">
-        <div id="song-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            </div>
-        
-        <div id="empty-state" class="hidden text-center py-20">
-            <i class="fa-solid fa-magnifying-glass text-4xl text-gray-300 mb-4"></i>
-            <p class="text-gray-500 font-medium">No encontramos ese himno.</p>
-        </div>
+        <div id="song-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+        <div id="empty-state" class="hidden text-center py-20"><p class="text-gray-500 font-medium">No se encontraron resultados.</p></div>
     </main>
 
     <footer id="player" class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-[0_-5px_20px_rgba(0,0,0,0.1)] p-3 z-40 transform translate-y-full transition-transform duration-300">
         <div class="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-            
             <div class="flex items-center gap-3 w-full md:w-1/4">
-                <div id="p-cover" class="w-14 h-14 bg-indigo-600 rounded-md flex items-center justify-center text-white font-black text-xl shadow-md">
-                    <i class="fa-solid fa-music"></i>
-                </div>
+                <div id="p-cover" class="w-14 h-14 bg-indigo-600 rounded-md flex items-center justify-center text-white font-black text-xl shadow-md"><i class="fa-solid fa-music"></i></div>
                 <div class="overflow-hidden">
                     <h4 id="p-title" class="font-bold text-gray-900 truncate text-sm">Selecciona un himno</h4>
                     <p id="p-number" class="text-xs text-indigo-600 font-bold uppercase">--</p>
                 </div>
             </div>
-
             <div class="flex flex-col items-center w-full md:w-1/2">
                 <div class="flex items-center gap-6 mb-2">
-                    <button class="text-gray-400 hover:text-indigo-600 transition"><i class="fa-solid fa-backward-step text-lg"></i></button>
-                    <button onclick="togglePlay()" class="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center hover:bg-indigo-700 hover:scale-105 transition shadow-lg">
-                        <i id="play-btn-icon" class="fa-solid fa-play ml-1"></i>
-                    </button>
-                    <button class="text-gray-400 hover:text-indigo-600 transition"><i class="fa-solid fa-forward-step text-lg"></i></button>
+                    <button onclick="togglePlay()" class="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center hover:bg-indigo-700 shadow-lg"><i id="play-btn-icon" class="fa-solid fa-play ml-1"></i></button>
                 </div>
                 <div class="w-full flex items-center gap-2 text-[10px] text-gray-500 font-mono w-full max-w-md">
                     <span id="curr-time">0:00</span>
@@ -83,11 +62,8 @@
                     <span id="dur-time">0:00</span>
                 </div>
             </div>
-
             <div class="flex items-center justify-end gap-3 w-full md:w-1/4">
-                <a id="dl-btn" href="#" download class="text-xs font-bold text-gray-600 hover:text-indigo-600 flex items-center gap-1 bg-gray-100 px-3 py-1.5 rounded-full transition">
-                    <i class="fa-solid fa-download"></i> <span class="hidden lg:inline">Descargar</span>
-                </a>
+                <a id="dl-btn" href="#" download class="text-xs font-bold text-gray-600 hover:text-indigo-600 flex items-center gap-1 bg-gray-100 px-3 py-1.5 rounded-full transition"><i class="fa-solid fa-download"></i> <span class="hidden lg:inline">Descargar</span></a>
                 <button onclick="closePlayer()" class="text-gray-400 hover:text-red-500 p-2"><i class="fa-solid fa-xmark"></i></button>
             </div>
         </div>
@@ -95,8 +71,7 @@
     </footer>
 
     <script>
-        // --- 1. TU LISTA DE ARCHIVOS (PEGADA EXACTAMENTE COMO LA ENVIASTE) ---
-        // El script se encarga de limpiarla automáticamente
+        // LISTA ORIGINAL (CON SIMBOLOS ROTOS)
         const rawFiles = `
 100. TRONOS Y REINADOS.mp3
 101. JESUS BENDITO.mp3
@@ -367,7 +342,7 @@
 364. DE HELADAS CORDILLERAS.mp3
 365. EL MUNDO PARA CRISTO.mp3
 366. TOCAD TROMPETA.mp3
-367 .NUESTRA ENSE¥A.mp3
+367. NUESTRA ENSE¥A.mp3
 368. SIEMBRA QUE HICIMOS.mp3
 369. ESCUCH TU VOZ.mp3
 370. MENSAJEROS DEL MAESTRO.mp3
@@ -597,27 +572,16 @@ TRIBUTAD.mp3
 VENID CANTAD.mp3
 VENID NUESTRAS.mp3`;
 
-        // --- 2. LOGICA DE PROCESAMIENTO ---
         const hymns = [];
 
-        // Función para limpiar nombres y que coincidan con los archivos renombrados
-        function cleanFileName(name) {
-            let clean = name.trim();
-            // Reemplazar caracteres raros
-            clean = clean.replace(/¥/g, 'n'); 
-            clean = clean.replace(//g, 'e');
-            // Todo a minúsculas
-            clean = clean.toLowerCase();
-            // Espacios a guiones bajos
-            clean = clean.replace(/\s+/g, '_');
-            // Quitar todo lo que no sea letra, número, guion o punto
-            clean = clean.replace(/[^a-z0-9_.-]/g, '');
-            return clean;
-        }
-
-        // Función para arreglar títulos para la pantalla (Mostrar Ñ y acentos)
-        function cleanDisplayTitle(title) {
-            return title.replace(/¥/g, 'Ñ').replace(//g, 'É');
+        // --- ESTA ES LA MAGIA SIN PYTHON ---
+        // Asumimos que tus archivos reales tienen Ñ y están en mayúsculas
+        function getRealFileName(brokenName) {
+            let name = brokenName.trim();
+            // Reemplazar símbolos rotos por los correctos para coincidir con el archivo real
+            name = name.replace(/¥/g, 'Ñ'); 
+            name = name.replace(//g, 'É');
+            return name;
         }
 
         function parseRawFiles() {
@@ -627,14 +591,15 @@ VENID NUESTRAS.mp3`;
                 line = line.trim();
                 if(!line) return;
                 
+                // Nombre corregido para mostrar y para buscar el archivo
+                // Ejemplo: "106. GLORIA AL SEÑOR.mp3"
+                const realName = getRealFileName(line); 
+                
                 let number = "";
                 let title = "";
-                // Quitamos la extensión para procesar el título
-                let cleanLine = line.replace('.mp3', '');
+                let cleanLine = realName.replace('.mp3', '');
                 
-                // Regex para separar número y título
                 const match = cleanLine.match(/^(\d+)\.?\s*(.*)$/);
-                
                 if (match) {
                     number = match[1];
                     title = match[2];
@@ -645,17 +610,14 @@ VENID NUESTRAS.mp3`;
                 hymns.push({
                     id: index,
                     number: number,
-                    title: cleanDisplayTitle(title), // Título bonito (con Ñ)
-                    // AQUÍ ESTÁ LA MAGIA: Generamos el nombre de archivo limpio
-                    file: cleanFileName(line) 
+                    title: title, 
+                    file: realName // Guardamos el nombre tal cual está en tu carpeta (con Ñ y mayúsculas)
                 });
             });
 
-            // Ordenar numéricamente
             hymns.sort((a, b) => {
                 const numA = parseInt(a.number);
                 const numB = parseInt(b.number);
-                
                 if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
                 if (!isNaN(numA)) return -1;
                 if (!isNaN(numB)) return 1;
@@ -665,7 +627,7 @@ VENID NUESTRAS.mp3`;
             document.getElementById('total-songs').innerText = `${hymns.length} CANCIONES DISPONIBLES`;
         }
 
-        // --- 3. RENDERIZADO VISUAL ---
+        // --- RENDERIZADO VISUAL ---
         function renderSongs(data) {
             const container = document.getElementById('song-list');
             container.innerHTML = '';
@@ -679,12 +641,15 @@ VENID NUESTRAS.mp3`;
             data.forEach(song => {
                 const hasNum = song.number !== "";
                 const displayNum = hasNum ? `<span class="text-indigo-600 font-black text-lg bg-indigo-50 w-10 h-10 flex items-center justify-center rounded-lg">${song.number}</span>` : `<i class="fa-solid fa-music text-indigo-200 text-xl w-10 text-center"></i>`;
-
-                // NOTA: En onclick pasamos song.file que ya está limpio (sin espacios ni ñ)
-                const safeTitle = song.title.replace(/'/g, "\\'"); // Escapar comillas simples
                 
+                // Escapar comillas para evitar errores
+                const safeTitle = song.title.replace(/'/g, "\\'"); 
+                // Para la URL, codificamos espacios y caracteres especiales
+                // encodeURIComponent convierte "SEÑOR.mp3" en "SE%C3%91OR.mp3" automáticamente
+                const encodedFile = encodeURIComponent(song.file);
+
                 const card = `
-                    <div class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all border border-gray-100 p-4 flex items-center justify-between group cursor-pointer" onclick="playSong('${song.file}', '${safeTitle}', '${song.number}')">
+                    <div class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all border border-gray-100 p-4 flex items-center justify-between group cursor-pointer" onclick="playSong('${encodedFile}', '${safeTitle}', '${song.number}')">
                         <div class="flex items-center gap-4 overflow-hidden">
                             ${displayNum}
                             <div class="truncate">
@@ -703,7 +668,6 @@ VENID NUESTRAS.mp3`;
             });
         }
 
-        // --- 4. FILTRO / BUSCADOR ---
         function filterSongs() {
             const query = document.getElementById('search').value.toLowerCase();
             const filtered = hymns.filter(s => 
@@ -713,7 +677,7 @@ VENID NUESTRAS.mp3`;
             renderSongs(filtered);
         }
 
-        // --- 5. LÓGICA DEL REPRODUCTOR ---
+        // --- REPRODUCTOR ---
         const audio = document.getElementById('audio-player');
         const player = document.getElementById('player');
         const playBtnIcon = document.getElementById('play-btn-icon');
@@ -721,17 +685,14 @@ VENID NUESTRAS.mp3`;
         let isPlaying = false;
 
         function playSong(file, title, number) {
-            // Actualizar interfaz
             document.getElementById('p-title').innerText = title;
             document.getElementById('p-number').innerText = number ? `HIMNO ${number}` : 'ADORACIÓN';
-            document.getElementById('dl-btn').href = file;
+            document.getElementById('dl-btn').href = decodeURIComponent(file);
             
-            // Cargar y reproducir
-            // Ya no usamos encodeURIComponent porque los nombres ya están limpios
+            // Usamos el archivo codificado (con %20, etc) para que el navegador lo entienda
             audio.src = file; 
             audio.play().catch(e => console.log("Error reproducción:", e));
             
-            // Mostrar reproductor
             player.classList.remove('translate-y-full');
             isPlaying = true;
             updatePlayIcon();
@@ -758,10 +719,8 @@ VENID NUESTRAS.mp3`;
         function updateProgress() {
             const { duration, currentTime } = audio;
             if(isNaN(duration)) return;
-            
             const progressPercent = (currentTime / duration) * 100;
             slider.value = progressPercent;
-            
             document.getElementById('curr-time').innerText = formatTime(currentTime);
             document.getElementById('dur-time').innerText = formatTime(duration);
         }
@@ -789,9 +748,10 @@ VENID NUESTRAS.mp3`;
             slider.value = 0;
         }
 
-        // --- INICIALIZAR ---
-        parseRawFiles(); 
-        renderSongs(hymns); 
+        // --- INICIAR ---
+        parseRawFiles();
+        renderSongs(hymns);
+
     </script>
 </body>
 </html>
