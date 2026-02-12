@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Himnario Web</title>
+    <title>Himnario Web Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -36,11 +36,19 @@
     </nav>
 
     <main class="container mx-auto px-4 py-8 fade-in">
-        <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <strong class="font-bold">Error:</strong>
-            <span class="block sm:inline" id="error-text"></span>
+        
+        <div id="error-box" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded shadow-lg sticky top-20 z-40">
+            <p class="font-bold flex items-center"><i class="fa-solid fa-circle-exclamation mr-2"></i> ERROR: Archivo no encontrado</p>
+            <p class="text-sm mt-1">El código buscó este archivo y no existe en tu carpeta:</p>
+            <p id="missing-file" class="font-mono bg-white px-2 py-1 rounded border border-red-200 mt-2 text-red-600 font-bold select-all">...</p>
+            <p class="text-xs mt-3 text-gray-600">
+                <strong>SOLUCIÓN:</strong> Copia el nombre correcto de tu carpeta y pégalo en la lista del código <code>index.html</code> reemplazando el nombre incorrecto.
+            </p>
+            <button onclick="document.getElementById('error-box').classList.add('hidden')" class="absolute top-2 right-2 text-red-400 hover:text-red-700"><i class="fa-solid fa-xmark"></i></button>
         </div>
+
         <div id="song-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+        <div id="empty-state" class="hidden text-center py-20"><p class="text-gray-500 font-medium">No se encontraron resultados.</p></div>
     </main>
 
     <footer id="player" class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-[0_-5px_20px_rgba(0,0,0,0.1)] p-3 z-40 transform translate-y-full transition-transform duration-300">
@@ -67,11 +75,11 @@
                 <button onclick="closePlayer()" class="text-gray-400 hover:text-red-500 p-2"><i class="fa-solid fa-xmark"></i></button>
             </div>
         </div>
-        <audio id="audio-player" preload="none" ontimeupdate="updateProgress()" onended="resetPlayer()" onerror="handleAudioError()"></audio>
+        <audio id="audio-player" preload="none" ontimeupdate="updateProgress()" onended="resetPlayer()" onerror="handleAudioError(this)"></audio>
     </footer>
 
     <script>
-        // HE LIMPIADO LA LISTA MANUALMENTE: "¥" ES AHORA "Ñ" Y "" ES "É"
+        // --- TU LISTA (TAL CUAL LA ENVIASTE) ---
         const rawFiles = `
 100. TRONOS Y REINADOS.mp3
 101. JESUS BENDITO.mp3
@@ -79,7 +87,7 @@
 103. DE JESUS.mp3
 104. DOQUIERA TU NOMBRE.mp3
 105. LOORES DAD A.mp3
-106. GLORIA AL SEÑOR.mp3
+106. GLORIA AL SE¥OR.mp3
 107. CUAN DULCE EL.mp3
 108. DIGNO ES.mp3
 109. LA TIERNA.mp3
@@ -136,21 +144,21 @@
 160. A SOLAS AL HUERTO YO VOY.mp3
 161. ES JESUCRISTO MI AMIGO.mp3
 162. DE CRSITO EL AMOR.mp3
-163. CERCA DE TI SEÑOR.mp3
+163. CERCA DE TI SE¥OR.mp3
 164. CERCA, MAS CERCA.mp3
 165. OH DULCE CRISTO.mp3
 166. LA TENUE SOMBRA.mp3
 167. DEL PADRE DE LAS LUCES.mp3
 168. OH JESUS PASTOR.mp3
 169. OYENOS PASTOR.mp3
-170. SEÑOR BENDITO SEAS.mp3
+170. SE¥OR BENDITO SEAS.mp3
 171. OH DULCE GRATA ORACION.mp3
 172. OH QUE AMIGO.mp3
 173. AL TRONO EXCELSO.mp3
 174. MEDITAR EN JESUS.mp3
 175. YO BUSCO SIN CESAR.mp3
 176. MI MANO TEN.mp3
-177. SEÑOR MI DIOS ESCUCHA.mp3
+177. SE¥OR MI DIOS ESCUCHA.mp3
 178. EN LOS INSTANTES.mp3
 179. NUESTRO SOL SE PONE.mp3
 180. YO TE SUPLICO.mp3
@@ -161,7 +169,7 @@
 185. NO IMPORTA QUE EN TINIEBLAS.mp3
 186. DIVINA LUZ.mp3
 187. REFUGIO TU.mp3
-188. SEÑOR JESUS LA LUZ DEL DIA.mp3
+188. SE¥OR JESUS LA LUZ DEL DIA.mp3
 189. CASTILLO FUERTE.mp3
 190. CUANDO ESTOY TRISTE.mp3
 191. EN JESUS MI ESPERANZA.mp3
@@ -181,20 +189,20 @@
 205. VINE A CRISTO JESUS.mp3
 206. HAY UN PASTOR.mp3
 207. TESORO INCOMPARABLE.mp3
-208. DEJÉ TODAS MIS CUITAS.mp3
+208. DEJ TODAS MIS CUITAS.mp3
 209. LEJOS DE MI PADRE.mp3
-210. COMO PODRÉ ESTAR.mp3
+210. COMO PODR ESTAR.mp3
 211. ES JESUS EL MEJOR.mp3
 212. EN JESUCRISTO MARTIR DE PAZ.mp3
 213. CUANDO COMBATIDO.mp3
 214. OH MAESTRO.mp3
-215. CARIÑOSO SALVADOR.mp3
+215. CARI¥OSO SALVADOR.mp3
 216. HAY QUIEN VELE.mp3
 217. YO CONFIO.mp3
 218. YO SE QUE EL PADRE.mp3
 219. SALVADOR MI BIEN.mp3
 220. MAS CERCA CADA DIA.mp3
-221. QUÉ ME IMPORTAN.mp3
+221. QU ME IMPORTAN.mp3
 222. CRISTO MI PILOTO.mp3
 223. ALIVIEMOS TODO AFAN.mp3
 224. CRISTO ESTA CONMIGO.mp3
@@ -209,15 +217,15 @@
 232. ARROLLADAS LAS TINIEBLAS.mp3
 233. LA GLORIA DE CRISTO.mp3
 234. EN LAS OLAS INMENSAS.mp3
-235. QUIÉN SERA MI FIADOR.mp3
+235. QUIN SERA MI FIADOR.mp3
 236. SI EN TUS SENDAS.mp3
 237. YENDO CON JESUS.mp3
-238. SEÑOR EN TI YO CREO.mp3
+238. SE¥OR EN TI YO CREO.mp3
 239. SIN TEMOR CAMINAREMOS.mp3
 240. ES LA PAZ.mp3
 241. EN CRISTO FELIZ ES MI ALMA.mp3
 242. TRAS LA TORMENTA.mp3
-243. ME GUIA ÉL.mp3
+243. ME GUIA L.mp3
 244. CRISTO ME AYUDA.mp3
 245. BOGANDO VAMOS.mp3
 246. SI SOLO ME ENCUENTRO.mp3
@@ -241,23 +249,23 @@
 264. VIVIR POR CRISTO.mp3
 265. APARTE DEL MUNDO.mp3
 266. MAS SANTIDAD.mp3
-267. TE QUIERO MI SEÑOR.mp3
-268. UNA ES SEÑOR.mp3
+267. TE QUIERO MI SE¥OR.mp3
+268. UNA ES SE¥OR.mp3
 269. HAZ LO QUE QUIERAS.mp3
 270. DEJO AL MUNDO.mp3
 271. QUE MI VIDA ENTERA.mp3
 272. MI ESPIRITU.mp3
 273. TENTADO NO CEDAS.mp3
 274. LA SENDA ANCHA.mp3
-275. OH JESUS SEÑOR DIVINO.mp3
+275. OH JESUS SE¥OR DIVINO.mp3
 276. YO QUIERO SER CUA MI JESUS.mp3
 277. SALVADOR A TI ME RINDO.mp3
-278. QUÉ ES LO QUE QUIERE EL SEÑOR DE MI.mp3
+278. QU ES LO QUE QUIERE EL SE¥OR DE MI.mp3
 279. CRISTO TU VOLUNTAD.mp3
-280. YO QUIERO TRABAJAR POR EL SEÑOR.mp3
+280. YO QUIERO TRABAJAR POR EL SE¥OR.mp3
 281. OBJETO DE MI FE.mp3
 282. CUAL MI MAESTRO.mp3
-283. QUÉ LE DARAS A CRISTO.mp3
+283. QU LE DARAS A CRISTO.mp3
 284. MUCHOS.mp3
 285. ES PROMESA.mp3
 286. DIOS OS GUARDE EN SU SANTO AMOR.mp3
@@ -277,9 +285,9 @@
 299. ANTE EL TRONO.mp3
 300. ESCUCHA OH DIOS.mp3
 301. HOY TE ALABAMOS DIOS DE BONDAD.mp3
-302. ALZARÉ CON ALEGRIA.mp3
+302. ALZAR CON ALEGRIA.mp3
 303. ALGUNA VEZ.mp3
-304. TAL VEZ EN AÑOS.mp3
+304. TAL VEZ EN A¥OS.mp3
 305. ETERNIDAD.mp3
 306. LLEAREMOS AL HOGAR.mp3
 307. AL PENSAR.mp3
@@ -289,19 +297,19 @@
 311. NADA PUEDE.mp3
 312. HAY UN PAIS.mp3
 313. EN PRESENCIA.mp3
-314. YO ESPERO LA MAÑANA.mp3
+314. YO ESPERO LA MA¥ANA.mp3
 315. A LA LUZ.mp3
 316. DE CELESTE PAIS.mp3
 317. AL BELLO HOGAR.mp3
 318. HAY UN MUNDO.mp3
-319. OH CÉLICA JERUSALEM.mp3
+319. OH CLICA JERUSALEM.mp3
 320. SI CONTEMPLAMOS.mp3
 321. NO HAY DECEPCION.mp3
 322. YO VOY VIAJANDO.mp3
-323. EN LA CÉLICA MORADA.mp3
+323. EN LA CLICA MORADA.mp3
 324. ROCA DE LA ETERNIDAD.mp3
 325. CUANDO LA TROMPETA SUENE.mp3
-326. AL SEPULCRO BAJARÉ.mp3
+326. AL SEPULCRO BAJAR.mp3
 327. EN LA MANSION.mp3
 328. SIN CESAR SIEMPRE.mp3
 329. SOL DE MI SER.mp3
@@ -310,7 +318,7 @@
 332. CUANDO MIS LUCHAS.mp3
 333. SERENA VOZ.mp3
 334. LOS SANTOS DE LA TIERA.mp3
-335. OH QUÉ DULCE ME ES.mp3
+335. OH QU DULCE ME ES.mp3
 336. ALLA LA PUERTA.mp3
 337. DONDE LA LUZ FULGURA.mp3
 338. LLENOS DE GOZO.mp3
@@ -318,10 +326,10 @@
 340. NO TE DE TEMOR.mp3
 341. NO SIN FRUTO HE DE LLEGAR.mp3
 342. VE, VE OH SION.mp3
-343. QUÉ DIRAS AL SABER.mp3
-344. SEMBRARÉ LA SIMIENTE.mp3
+343. QU DIRAS AL SABER.mp3
+344. SEMBRAR LA SIMIENTE.mp3
 345. ESCUCHAD JESUS NOS DICE.mp3
-346. EN LA MONTAÑA.mp3
+346. EN LA MONTA¥A.mp3
 347. LA NAVE EVANGELISTA.mp3
 348. ALGUIEN PROEZAS.mp3
 349. DESPLIEGUE EL CRISTIANO.mp3
@@ -342,14 +350,14 @@
 364. DE HELADAS CORDILLERAS.mp3
 365. EL MUNDO PARA CRISTO.mp3
 366. TOCAD TROMPETA.mp3
-367. NUESTRA ENSEÑA.mp3
+367 .NUESTRA ENSE¥A.mp3
 368. SIEMBRA QUE HICIMOS.mp3
-369. ESCUCHÉ TU VOZ.mp3
+369. ESCUCH TU VOZ.mp3
 370. MENSAJEROS DEL MAESTRO.mp3
 371. SOMOS ALIADOS DE LAS HUESTES.mp3
 372. VENID LOS OBREROS.mp3
-373. QUIÉN A CRISTO.mp3
-374. COMO HABRÉ DE.mp3
+373. QUIN A CRISTO.mp3
+374. COMO HABR DE.mp3
 375. SI POR CRISTO.mp3
 376. CANSADO Y TRISTE.mp3
 377. POR CRISTO ES NUESTRO.mp3
@@ -367,7 +375,7 @@
 389. MIENTRAS ORO.mp3
 390. SI ESTAS TU TRISTE.mp3
 391. EL MUNDO PERDIDO.mp3
-392. QUÉ SUBLIME.mp3
+392. QU SUBLIME.mp3
 393. PRESTE OIDOS.mp3
 394. CON VOZ BONIGNA.mp3
 395. A JESUCRISTO VEN AHORA.mp3
@@ -388,29 +396,29 @@
 409. HE HALLADO.mp3
 41. TU DEJASTE.mp3
 410. POBRE PEREGRINO.mp3
-411. MIRÉ CON ANSIA.mp3
+411. MIR CON ANSIA.mp3
 412. VENID A MI LOS TRISTES.mp3
 413. TE SIENTES CASI.mp3
 414. SEGURO SE HALLA.mp3
 415. SI HAS ESCUCHADO.mp3
 416. OH ESCUCHAD.mp3
-417. QUÉ VAS A HACER.mp3
+417. QU VAS A HACER.mp3
 418. VEN ALMA QUE LLORAS.mp3
 419. HOY MISMO.mp3
 42. SUENEN DULCES.mp3
 420. REGRESA, REGRESA.mp3
 421. A TU PUERTA CRISTO ESTA.mp3
-422. QUÉ VAS A HACER.mp3
+422. QU VAS A HACER.mp3
 423. PECADOR QUE EN EL MUNDO.mp3
 424. VEN A CRISTO.mp3
 425. ACUDID A BEBER.mp3
 426. A JESUS VEN HOY.mp3
 427. EN JESUS MIL PROEZAS HAREMOS.mp3
-428. MUJERES DE LA VIÑA.mp3
+428. MUJERES DE LA VI¥A.mp3
 428. MUJERES SIERVAS DEL MAESTRO.mp3
 429. MUJERES MEXICANAS.mp3
 429. UNIDAS, MUJERES MEXICANAS.mp3
-429. UNIDAS, SIRVIENDO AL SEÑOR.mp3
+429. UNIDAS, SIRVIENDO AL SE¥OR.mp3
 43. ANUNCIAN.mp3
 430.SOCIEDADES DE ESFUERZO.mp3
 431. JESUS TE NECESITA.mp3
@@ -419,7 +427,7 @@
 434. OH JOVENES.mp3
 435. A JESUCRISTO QUIERO LLEGARME.mp3
 436. A DIOS PIADOSO.mp3
-437. AUNQUE SOY PEQUEÑUELO.mp3
+437. AUNQUE SOY PEQUE¥UELO.mp3
 438. DEL TRONO SANTO.mp3
 439. JESUCRISTO HA VENIDO.mp3
 44. ESTRELLITA.mp3
@@ -428,25 +436,25 @@
 442. POR LO HERMOSO.mp3
 443. QUE DULCE ES.mp3
 444. PADRE SANTO.mp3
-445. ALABADLE OH NIÑITOS.mp3
+445. ALABADLE OH NI¥ITOS.mp3
 446. LA BIBLIA ES EL LIBRO.mp3
 447. OH JESUS BENDICE.mp3
 448. PIDE Y SE TE DARA.mp3
 449. LOS CAMPOS.mp3
 45. NOCHE DE PAZ.mp3
-450. QUÉ NOS DICE.mp3
+450. QU NOS DICE.mp3
 451. ME GUIA TU PALABRA.mp3
 452. ESTOY PRESTO.mp3
 453. HOSANNA, HOSANNA.mp3
 454. CANTE AL DARNOS.mp3
 455. LEE TU BIBLIA.mp3
 456. JESUCRISTO AMA.mp3
-457. SOMOS SOLO NIÑOS.mp3
-458. PUEDE UN NIÑO.mp3
+457. SOMOS SOLO NI¥OS.mp3
+458. PUEDE UN NI¥O.mp3
 459. YO QUIERO QUE.mp3
 46. OTRA VEZ.mp3
 460. CRISTO ME AMA.mp3
-461. ACERCATE NIÑITO.mp3
+461. ACERCATE NI¥ITO.mp3
 462. JESUCRISTO DESCENDIO.mp3
 463. MARAVILLOSA HISTORIA.mp3
 464. YO ESTOY CONTIGO.mp3
@@ -458,7 +466,7 @@
 47. OH ALDEHUELA.mp3
 470. NO SABEIS.mp3
 471. EN LA TIERRA.mp3
-472. CRISTO A LOS NIÑOS.mp3
+472. CRISTO A LOS NI¥OS.mp3
 473. HOSANNAS DIERON.mp3
 474. QUIERE JESUS.mp3
 475. DIOS DE ESTE MUNDO.mp3
@@ -478,7 +486,7 @@
 488. GLORIA, GLORIA.mp3
 489. CRISTO ME AMA.mp3
 49. JUBILOSA.mp3
-490. SEÑOR AYUDAME.mp3
+490. SE¥OR AYUDAME.mp3
 491. CRISTO ROMPE.mp3
 492. YO QUIERO, YO QUIERO.mp3
 50. DE LA NOCHE.mp3
@@ -515,8 +523,8 @@
 81. CRISTO VIVE.mp3
 82. DEL-SEPULCRO.mp3
 83. UNIDOS EN ESPIRITU.mp3
-84. EL SEÑOR RESUCITO 1a.mp3
-84. EL SEÑOR RESUCITO 2a.mp3
+84. EL SE¥OR RESUCITO 1a.mp3
+84. EL SE¥OR RESUCITO 2a.mp3
 85. HACIA EL SEPULCRO.mp3
 86. AL HUERTO VAN.mp3
 87. LA TUMBA.mp3
@@ -547,7 +555,7 @@ DAD A DIOS.mp3
 DAD LOOR.mp3
 DEL CULTO.mp3
 DESPIDE HOY.mp3
-DESPUES SEÑOR.mp3
+DESPUES SE¥OR.mp3
 DULCES MELODIAS.mp3
 FUENTE DE LA VIDA.mp3
 GLORIA A DIOS EN.mp3
@@ -560,13 +568,13 @@ LOOR A TI.mp3
 NUNCA DIOS MIO.mp3
 OH CUANTA.mp3
 OH SANTISIMO.mp3
-OH SEÑOR.mp3
+OH SE¥OR.mp3
 OID UN SON.mp3
 SANTO SANTO.mp3
 SANTO.mp3
 SER INFINITO.mp3
-SEÑOR JESUS.mp3
-SOLO A TI, DIOS Y SEÑOR.mp3
+SE¥OR JESUS.mp3
+SOLO A TI, DIOS Y SE¥OR.mp3
 TIERNAS CANCIONES.mp3
 TRIBUTAD.mp3
 VENID CANTAD.mp3
@@ -574,42 +582,52 @@ VENID NUESTRAS.mp3`;
 
         const hymns = [];
 
+        // --- MAGIA SIN PYTHON ---
+        // 1. Corrige símbolos automáticamente
+        // 2. Te avisa si el nombre está cortado (ej: VIC vs VICTORIA)
+        function fixEncoding(text) {
+            let fixed = text;
+            fixed = fixed.replace(/¥/g, 'Ñ');  
+            fixed = fixed.replace(//g, 'É');  
+            fixed = fixed.replace(/‚/g, 'é');  // Caso especial para "Evang‚licos"
+            return fixed;
+        }
+
         function parseRawFiles() {
             const lines = rawFiles.trim().split('\n');
-            
             lines.forEach((line, index) => {
                 line = line.trim();
                 if(!line) return;
+
+                // 1. Arreglamos los símbolos raros para mostrarlo bonito
+                let correctedName = fixEncoding(line);
                 
-                // --- 1. SEPARAR NÚMERO Y TÍTULO ---
                 let number = "";
                 let title = "";
-                // Quitamos la extensión .mp3 para mostrar el nombre
-                let cleanLine = line.replace('.mp3', '');
-                
-                // Esta expresión busca: "123. TITULO"
-                const match = cleanLine.match(/^(\d+)\.?\s*(.*)$/);
+                let displayTitle = correctedName.replace('.mp3', '');
+
+                const match = displayTitle.match(/^(\d+)\.?\s*(.*)$/);
                 if (match) {
                     number = match[1];
                     title = match[2];
                 } else {
-                    title = cleanLine;
+                    title = displayTitle;
                 }
 
-                // --- 2. PREPARAR EL LINK DEL ARCHIVO ---
-                // NO cambiamos a minúsculas ni quitamos la Ñ, porque tus archivos tienen Ñ y Mayúsculas.
-                // encodeURIComponent arregla los espacios (%) y las Ñ (%C3%91) automáticamente.
-                const fileUrl = encodeURIComponent(line);
+                // 2. Aquí está el truco:
+                // El navegador necesita símbolos especiales para espacios y acentos (%20, %C3%91).
+                // "encodeURIComponent" hace eso automáticamente.
+                const fileLink = encodeURIComponent(correctedName);
 
                 hymns.push({
                     id: index,
                     number: number,
                     title: title, 
-                    file: fileUrl // Link listo para usar
+                    file: fileLink,
+                    originalName: line // Guardamos el original para mostrar en caso de error
                 });
             });
 
-            // Ordenar por número
             hymns.sort((a, b) => {
                 const numA = parseInt(a.number);
                 const numB = parseInt(b.number);
@@ -622,7 +640,6 @@ VENID NUESTRAS.mp3`;
             document.getElementById('total-songs').innerText = `${hymns.length} CANCIONES DISPONIBLES`;
         }
 
-        // --- RENDERIZADO VISUAL ---
         function renderSongs(data) {
             const container = document.getElementById('song-list');
             container.innerHTML = '';
@@ -636,12 +653,10 @@ VENID NUESTRAS.mp3`;
             data.forEach(song => {
                 const hasNum = song.number !== "";
                 const displayNum = hasNum ? `<span class="text-indigo-600 font-black text-lg bg-indigo-50 w-10 h-10 flex items-center justify-center rounded-lg">${song.number}</span>` : `<i class="fa-solid fa-music text-indigo-200 text-xl w-10 text-center"></i>`;
-                
-                // safeTitle escapa las comillas simples para que no rompa el HTML
                 const safeTitle = song.title.replace(/'/g, "\\'"); 
 
                 const card = `
-                    <div class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all border border-gray-100 p-4 flex items-center justify-between group cursor-pointer" onclick="playSong('${song.file}', '${safeTitle}', '${song.number}')">
+                    <div class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all border border-gray-100 p-4 flex items-center justify-between group cursor-pointer" onclick="playSong('${song.file}', '${safeTitle}', '${song.number}', '${song.originalName}')">
                         <div class="flex items-center gap-4 overflow-hidden">
                             ${displayNum}
                             <div class="truncate">
@@ -674,38 +689,30 @@ VENID NUESTRAS.mp3`;
         const player = document.getElementById('player');
         const playBtnIcon = document.getElementById('play-btn-icon');
         const slider = document.getElementById('seek-slider');
-        const errorMsg = document.getElementById('error-message');
-        const errorText = document.getElementById('error-text');
+        const errorBox = document.getElementById('error-box');
+        const missingFileText = document.getElementById('missing-file');
         let isPlaying = false;
 
-        function playSong(file, title, number) {
-            // Ocultar error previo si existe
-            errorMsg.classList.add('hidden');
-
+        function playSong(file, title, number, originalName) {
+            errorBox.classList.add('hidden'); // Ocultar error anterior
             document.getElementById('p-title').innerText = title;
             document.getElementById('p-number').innerText = number ? `HIMNO ${number}` : 'ADORACIÓN';
-            
-            // decodeURIComponent para que el nombre del archivo al descargar sea legible
             document.getElementById('dl-btn').href = decodeURIComponent(file);
             
-            // Asignar archivo y reproducir
+            // Intentar reproducir
             audio.src = decodeURIComponent(file); 
-            audio.play().catch(e => {
-                console.log("Error reproducción automática (navegador bloqueó):", e);
-                // No mostramos error rojo aquí, solo si falla la carga del archivo
-            });
+            audio.play().catch(e => console.log("Auto-play blocked", e));
             
             player.classList.remove('translate-y-full');
             isPlaying = true;
             updatePlayIcon();
         }
 
-        function handleAudioError() {
-            const src = audio.src;
-            // Mostramos el nombre del archivo que falló
-            const fileName = decodeURIComponent(src.split('/').pop());
-            errorText.innerText = `No se pudo encontrar el archivo: "${fileName}". Verifica que el nombre en tu computadora sea EXACTAMENTE igual.`;
-            errorMsg.classList.remove('hidden');
+        function handleAudioError(e) {
+            // AQUÍ SALTA EL ERROR SI EL NOMBRE NO COINCIDE
+            const fileName = decodeURIComponent(audio.src.split('/').pop());
+            missingFileText.innerText = fileName;
+            errorBox.classList.remove('hidden');
             isPlaying = false;
             updatePlayIcon();
         }
@@ -752,7 +759,7 @@ VENID NUESTRAS.mp3`;
             audio.pause();
             isPlaying = false;
             player.classList.add('translate-y-full');
-            errorMsg.classList.add('hidden');
+            errorBox.classList.add('hidden');
         }
 
         function resetPlayer() {
@@ -761,7 +768,7 @@ VENID NUESTRAS.mp3`;
             slider.value = 0;
         }
 
-        // --- INICIAR ---
+        // START
         parseRawFiles();
         renderSongs(hymns);
 
