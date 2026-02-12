@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Himnario Web Pro</title>
+    <title>Himnario Web Seguro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -35,15 +35,12 @@
         </div>
     </nav>
 
-    <main class="container mx-auto px-4 py-8 fade-in">
-        
+    <main class="container mx-auto px-4 py-8">
         <div id="error-box" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded shadow-lg sticky top-20 z-40">
-            <p class="font-bold flex items-center"><i class="fa-solid fa-circle-exclamation mr-2"></i> ERROR: Archivo no encontrado</p>
-            <p class="text-sm mt-1">El código buscó este archivo y no existe en tu carpeta:</p>
-            <p id="missing-file" class="font-mono bg-white px-2 py-1 rounded border border-red-200 mt-2 text-red-600 font-bold select-all">...</p>
-            <p class="text-xs mt-3 text-gray-600">
-                <strong>SOLUCIÓN:</strong> Copia el nombre correcto de tu carpeta y pégalo en la lista del código <code>index.html</code> reemplazando el nombre incorrecto.
-            </p>
+            <p class="font-bold flex items-center"><i class="fa-solid fa-circle-exclamation mr-2"></i> No se encuentra el archivo</p>
+            <p class="text-sm mt-1">El sistema buscó esto y no existe:</p>
+            <p id="missing-file" class="font-mono bg-white px-2 py-1 rounded border border-red-200 mt-2 text-red-600 font-bold select-all break-all">...</p>
+            <p class="text-xs mt-3 text-gray-600"><strong>SOLUCIÓN:</strong> Busca este himno en tu código y asegúrate que el nombre sea IDÉNTICO al que tienes en tu carpeta de Windows.</p>
             <button onclick="document.getElementById('error-box').classList.add('hidden')" class="absolute top-2 right-2 text-red-400 hover:text-red-700"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
@@ -79,7 +76,7 @@
     </footer>
 
     <script>
-        // --- TU LISTA (TAL CUAL LA ENVIASTE) ---
+        // --- 1. TU LISTA DE ARCHIVOS ---
         const rawFiles = `
 100. TRONOS Y REINADOS.mp3
 101. JESUS BENDITO.mp3
@@ -580,27 +577,28 @@ TRIBUTAD.mp3
 VENID CANTAD.mp3
 VENID NUESTRAS.mp3`;
 
-        const hymns = [];
+        // --- 2. MOTOR INTELIGENTE (SIN PYTHON) ---
+        let hymns = [];
 
-        // --- MAGIA SIN PYTHON ---
-        // 1. Corrige símbolos automáticamente
-        // 2. Te avisa si el nombre está cortado (ej: VIC vs VICTORIA)
+        // Función que limpia los nombres "sucios" para buscar el archivo real
         function fixEncoding(text) {
             let fixed = text;
-            fixed = fixed.replace(/¥/g, 'Ñ');  
-            fixed = fixed.replace(//g, 'É');  
-            fixed = fixed.replace(/‚/g, 'é');  // Caso especial para "Evang‚licos"
+            fixed = fixed.replace(/¥/g, 'Ñ');  // Arregla la Ñ
+            fixed = fixed.replace(//g, 'É');  // Arregla la É
+            fixed = fixed.replace(/‚/g, 'é');  // Arregla acentos raros
             return fixed;
         }
 
         function parseRawFiles() {
             const lines = rawFiles.trim().split('\n');
+            hymns = []; // Limpiamos array
+
             lines.forEach((line, index) => {
                 line = line.trim();
                 if(!line) return;
 
-                // 1. Arreglamos los símbolos raros para mostrarlo bonito
-                let correctedName = fixEncoding(line);
+                // 1. Arreglar símbolos raros para el título bonito
+                const correctedName = fixEncoding(line);
                 
                 let number = "";
                 let title = "";
@@ -614,20 +612,20 @@ VENID NUESTRAS.mp3`;
                     title = displayTitle;
                 }
 
-                // 2. Aquí está el truco:
-                // El navegador necesita símbolos especiales para espacios y acentos (%20, %C3%91).
-                // "encodeURIComponent" hace eso automáticamente.
+                // 2. Preparamos el link seguro
+                // "encodeURIComponent" convierte espacios en %20 y Ñ en código legible
                 const fileLink = encodeURIComponent(correctedName);
 
                 hymns.push({
-                    id: index,
+                    id: index, // ESTE ES EL ID MÁGICO
                     number: number,
-                    title: title, 
-                    file: fileLink,
-                    originalName: line // Guardamos el original para mostrar en caso de error
+                    title: title,
+                    originalName: line, // Guardamos el nombre original por si acaso
+                    file: fileLink
                 });
             });
 
+            // Ordenar por número
             hymns.sort((a, b) => {
                 const numA = parseInt(a.number);
                 const numB = parseInt(b.number);
@@ -640,6 +638,7 @@ VENID NUESTRAS.mp3`;
             document.getElementById('total-songs').innerText = `${hymns.length} CANCIONES DISPONIBLES`;
         }
 
+        // --- 3. RENDERIZADO (SOLUCIÓN PANTALLA BLANCA) ---
         function renderSongs(data) {
             const container = document.getElementById('song-list');
             container.innerHTML = '';
@@ -650,13 +649,14 @@ VENID NUESTRAS.mp3`;
             }
             document.getElementById('empty-state').classList.add('hidden');
 
-            data.forEach(song => {
+            data.forEach((song, i) => {
                 const hasNum = song.number !== "";
                 const displayNum = hasNum ? `<span class="text-indigo-600 font-black text-lg bg-indigo-50 w-10 h-10 flex items-center justify-center rounded-lg">${song.number}</span>` : `<i class="fa-solid fa-music text-indigo-200 text-xl w-10 text-center"></i>`;
-                const safeTitle = song.title.replace(/'/g, "\\'"); 
-
+                
+                // --- CAMBIO CLAVE: Usamos el índice (i) en vez de pasar strings ---
+                // Esto evita que comillas o nombres raros rompan el HTML
                 const card = `
-                    <div class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all border border-gray-100 p-4 flex items-center justify-between group cursor-pointer" onclick="playSong('${song.file}', '${safeTitle}', '${song.number}', '${song.originalName}')">
+                    <div class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all border border-gray-100 p-4 flex items-center justify-between group cursor-pointer" onclick="playSongByIndex(${i})">
                         <div class="flex items-center gap-4 overflow-hidden">
                             ${displayNum}
                             <div class="truncate">
@@ -677,14 +677,52 @@ VENID NUESTRAS.mp3`;
 
         function filterSongs() {
             const query = document.getElementById('search').value.toLowerCase();
+            // Filtramos pero mantenemos la referencia al objeto original
             const filtered = hymns.filter(s => 
                 s.title.toLowerCase().includes(query) || 
                 s.number.includes(query)
             );
-            renderSongs(filtered);
+            // Renderizamos la lista filtrada
+            // NOTA: Al filtrar, el índice "i" cambiará, así que necesitamos una estrategia mejor.
+            // Solución rápida: Pasamos el objeto completo al render
+            renderFiltered(filtered);
         }
 
-        // --- REPRODUCTOR ---
+        function renderFiltered(data) {
+            const container = document.getElementById('song-list');
+            container.innerHTML = '';
+            if(data.length === 0) {
+                document.getElementById('empty-state').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('empty-state').classList.add('hidden');
+
+            data.forEach(song => {
+                const hasNum = song.number !== "";
+                const displayNum = hasNum ? `<span class="text-indigo-600 font-black text-lg bg-indigo-50 w-10 h-10 flex items-center justify-center rounded-lg">${song.number}</span>` : `<i class="fa-solid fa-music text-indigo-200 text-xl w-10 text-center"></i>`;
+                
+                // Usamos el ID original que guardamos en parseRawFiles
+                const card = `
+                    <div class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all border border-gray-100 p-4 flex items-center justify-between group cursor-pointer" onclick="playSongById(${song.id})">
+                        <div class="flex items-center gap-4 overflow-hidden">
+                            ${displayNum}
+                            <div class="truncate">
+                                <h3 class="font-bold text-gray-800 text-sm group-hover:text-indigo-600 transition truncate pr-2">${song.title}</h3>
+                                <p class="text-[10px] text-gray-400 uppercase tracking-wide">Himno</p>
+                            </div>
+                        </div>
+                        <div class="opacity-0 group-hover:opacity-100 transition-opacity">
+                             <button class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-md transform active:scale-95">
+                                <i class="fa-solid fa-play text-xs ml-0.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+        }
+
+        // --- 4. REPRODUCTOR ---
         const audio = document.getElementById('audio-player');
         const player = document.getElementById('player');
         const playBtnIcon = document.getElementById('play-btn-icon');
@@ -693,14 +731,29 @@ VENID NUESTRAS.mp3`;
         const missingFileText = document.getElementById('missing-file');
         let isPlaying = false;
 
-        function playSong(file, title, number, originalName) {
-            errorBox.classList.add('hidden'); // Ocultar error anterior
-            document.getElementById('p-title').innerText = title;
-            document.getElementById('p-number').innerText = number ? `HIMNO ${number}` : 'ADORACIÓN';
-            document.getElementById('dl-btn').href = decodeURIComponent(file);
+        // Nuevas funciones para tocar por ID (Indestructibles)
+        function playSongByIndex(index) {
+            const song = hymns[index];
+            loadSong(song);
+        }
+
+        function playSongById(id) {
+            const song = hymns.find(h => h.id === id);
+            loadSong(song);
+        }
+
+        function loadSong(song) {
+            if(!song) return;
+            
+            errorBox.classList.add('hidden'); // Ocultar error
+            document.getElementById('p-title').innerText = song.title;
+            document.getElementById('p-number').innerText = song.number ? `HIMNO ${song.number}` : 'ADORACIÓN';
+            document.getElementById('dl-btn').href = decodeURIComponent(song.file);
+            
+            // Asignar archivo
+            audio.src = song.file; 
             
             // Intentar reproducir
-            audio.src = decodeURIComponent(file); 
             audio.play().catch(e => console.log("Auto-play blocked", e));
             
             player.classList.remove('translate-y-full');
@@ -709,7 +762,7 @@ VENID NUESTRAS.mp3`;
         }
 
         function handleAudioError(e) {
-            // AQUÍ SALTA EL ERROR SI EL NOMBRE NO COINCIDE
+            // ERROR: ARCHIVO NO ENCONTRADO
             const fileName = decodeURIComponent(audio.src.split('/').pop());
             missingFileText.innerText = fileName;
             errorBox.classList.remove('hidden');
@@ -768,9 +821,10 @@ VENID NUESTRAS.mp3`;
             slider.value = 0;
         }
 
-        // START
+        // --- INICIAR ---
         parseRawFiles();
-        renderSongs(hymns);
+        // Usamos renderFiltered para la primera carga también, es más seguro
+        renderFiltered(hymns);
 
     </script>
 </body>
