@@ -91,11 +91,12 @@
                 <button onclick="closePlayer()" class="text-gray-400 hover:text-red-500 p-2"><i class="fa-solid fa-xmark"></i></button>
             </div>
         </div>
-        <audio id="audio-player" ontimeupdate="updateProgress()" onended="resetPlayer()"></audio>
+        <audio id="audio-player" preload="none" ontimeupdate="updateProgress()" onended="resetPlayer()"></audio>
     </footer>
 
     <script>
         // --- 1. TU LISTA DE ARCHIVOS (PEGADA EXACTAMENTE COMO LA ENVIASTE) ---
+        // El script se encarga de limpiarla automáticamente
         const rawFiles = `
 100. TRONOS Y REINADOS.mp3
 101. JESUS BENDITO.mp3
@@ -596,8 +597,28 @@ TRIBUTAD.mp3
 VENID CANTAD.mp3
 VENID NUESTRAS.mp3`;
 
-        // --- 2. LOGICA DE PROCESAMIENTO DE DATOS ---
+        // --- 2. LOGICA DE PROCESAMIENTO ---
         const hymns = [];
+
+        // Función para limpiar nombres y que coincidan con los archivos renombrados
+        function cleanFileName(name) {
+            let clean = name.trim();
+            // Reemplazar caracteres raros
+            clean = clean.replace(/¥/g, 'n'); 
+            clean = clean.replace(//g, 'e');
+            // Todo a minúsculas
+            clean = clean.toLowerCase();
+            // Espacios a guiones bajos
+            clean = clean.replace(/\s+/g, '_');
+            // Quitar todo lo que no sea letra, número, guion o punto
+            clean = clean.replace(/[^a-z0-9_.-]/g, '');
+            return clean;
+        }
+
+        // Función para arreglar títulos para la pantalla (Mostrar Ñ y acentos)
+        function cleanDisplayTitle(title) {
+            return title.replace(/¥/g, 'Ñ').replace(//g, 'É');
+        }
 
         function parseRawFiles() {
             const lines = rawFiles.trim().split('\n');
@@ -608,9 +629,10 @@ VENID NUESTRAS.mp3`;
                 
                 let number = "";
                 let title = "";
+                // Quitamos la extensión para procesar el título
                 let cleanLine = line.replace('.mp3', '');
                 
-                // Regex para extraer numero si existe (Ej: "123. TITULO")
+                // Regex para separar número y título
                 const match = cleanLine.match(/^(\d+)\.?\s*(.*)$/);
                 
                 if (match) {
@@ -623,12 +645,13 @@ VENID NUESTRAS.mp3`;
                 hymns.push({
                     id: index,
                     number: number,
-                    title: title,
-                    file: line
+                    title: cleanDisplayTitle(title), // Título bonito (con Ñ)
+                    // AQUÍ ESTÁ LA MAGIA: Generamos el nombre de archivo limpio
+                    file: cleanFileName(line) 
                 });
             });
 
-            // Ordenar: Primero los numerados, luego alfabético
+            // Ordenar numéricamente
             hymns.sort((a, b) => {
                 const numA = parseInt(a.number);
                 const numB = parseInt(b.number);
@@ -657,8 +680,11 @@ VENID NUESTRAS.mp3`;
                 const hasNum = song.number !== "";
                 const displayNum = hasNum ? `<span class="text-indigo-600 font-black text-lg bg-indigo-50 w-10 h-10 flex items-center justify-center rounded-lg">${song.number}</span>` : `<i class="fa-solid fa-music text-indigo-200 text-xl w-10 text-center"></i>`;
 
+                // NOTA: En onclick pasamos song.file que ya está limpio (sin espacios ni ñ)
+                const safeTitle = song.title.replace(/'/g, "\\'"); // Escapar comillas simples
+                
                 const card = `
-                    <div class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all border border-gray-100 p-4 flex items-center justify-between group cursor-pointer" onclick="playSong('${song.file}', '${song.title}', '${song.number}')">
+                    <div class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all border border-gray-100 p-4 flex items-center justify-between group cursor-pointer" onclick="playSong('${song.file}', '${safeTitle}', '${song.number}')">
                         <div class="flex items-center gap-4 overflow-hidden">
                             ${displayNum}
                             <div class="truncate">
@@ -687,7 +713,7 @@ VENID NUESTRAS.mp3`;
             renderSongs(filtered);
         }
 
-        // --- 5. LOGICA DEL REPRODUCTOR (AUDIO API) ---
+        // --- 5. LÓGICA DEL REPRODUCTOR ---
         const audio = document.getElementById('audio-player');
         const player = document.getElementById('player');
         const playBtnIcon = document.getElementById('play-btn-icon');
@@ -695,17 +721,17 @@ VENID NUESTRAS.mp3`;
         let isPlaying = false;
 
         function playSong(file, title, number) {
-            // Configurar datos
+            // Actualizar interfaz
             document.getElementById('p-title').innerText = title;
             document.getElementById('p-number').innerText = number ? `HIMNO ${number}` : 'ADORACIÓN';
             document.getElementById('dl-btn').href = file;
             
-            // Cargar Audio
-            // NOTA: Codificamos la URL para que espacios y caracteres raros (como ¥) funcionen
-            audio.src = encodeURIComponent(file);
+            // Cargar y reproducir
+            // Ya no usamos encodeURIComponent porque los nombres ya están limpios
+            audio.src = file; 
             audio.play().catch(e => console.log("Error reproducción:", e));
             
-            // UI Update
+            // Mostrar reproductor
             player.classList.remove('translate-y-full');
             isPlaying = true;
             updatePlayIcon();
@@ -736,7 +762,6 @@ VENID NUESTRAS.mp3`;
             const progressPercent = (currentTime / duration) * 100;
             slider.value = progressPercent;
             
-            // Formato tiempo 00:00
             document.getElementById('curr-time').innerText = formatTime(currentTime);
             document.getElementById('dur-time').innerText = formatTime(duration);
         }
@@ -765,9 +790,8 @@ VENID NUESTRAS.mp3`;
         }
 
         // --- INICIALIZAR ---
-        parseRawFiles(); // 1. Convertir texto a datos
-        renderSongs(hymns); // 2. Dibujar en pantalla
-
+        parseRawFiles(); 
+        renderSongs(hymns); 
     </script>
 </body>
 </html>
